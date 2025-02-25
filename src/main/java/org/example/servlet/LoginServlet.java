@@ -41,10 +41,10 @@ public class LoginServlet extends HttpServlet {
             // Chuyển hướng dựa vào role
             if ("ADMIN".equals(user.getRole())) {
                 // nếu role là admin thì chuyển hướng đến trang admin/dashboard
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard"); // ở đây ví dụ là admin/dashboard, sau này muốn thay gì thay
+                response.sendRedirect(request.getContextPath() + "/admin/posts"); // ở đây ví dụ là admin/dashboard, sau này muốn thay gì thay
             } else {
                 // nếu role là user thì chuyển hướng đến trang home
-                response.sendRedirect(request.getContextPath() + "/home"); 
+                response.sendRedirect(request.getContextPath() + "/"); 
             }
             
         } catch (NoResultException e) {

@@ -14,6 +14,8 @@ import java.io.IOException;
 
 @WebFilter("/*") //Dùng để bắt tất cả các request (Tất cả các trang đều phải qua filter này)
 public class AuthFilter implements Filter {
+
+    private static final String[] PUBLIC_PAGES = {"/login", "/register", "/login.jsp", "/register.jsp"};
     
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -27,16 +29,17 @@ public class AuthFilter implements Filter {
         
         // Kiểm tra nếu user đã đăng nhập
         boolean isLoggedIn = (session != null && session.getAttribute("user") != null); //Kiểm tra xem user có đăng nhập không
-        boolean isLoginPage = path.equals("/login") || path.equals("/login.jsp"); //Kiểm tra xem path có phải là trang login không
-        boolean isRegisterPage = path.equals("/register") || path.equals("/register.jsp"); //Kiểm tra xem path có phải là trang register không
+        boolean isPublicPage = containsPath(path, PUBLIC_PAGES); //Kiểm tra xem path có phải là trang login, register hoặc resource files không
         boolean isPublicResource = path.endsWith(".css") || path.endsWith(".js"); //Kiểm tra xem path có phải là file css hoặc js không
-        boolean isHomePage = path.equals("/") || path.equals("/home.jsp"); //Kiểm tra xem path có phải là trang home không
+        boolean isAdminPage = path.startsWith("/admin/"); //Kiểm tra xem path có phải là trang admin không
         
         if (isLoggedIn) {
+            // Lấy role của user
+            String role = (String) session.getAttribute("role");
+            
             // Nếu đã đăng nhập và cố truy cập trang login/register
-            if (isLoginPage || isRegisterPage) {
+            if (isPublicPage) {
                 // Chuyển hướng về trang chủ tương ứng với role
-                String role = (String) session.getAttribute("role");
                 if ("ADMIN".equals(role)) {
                     httpResponse.sendRedirect(httpRequest.getContextPath() + "/admin/dashboard");
                 } else {
@@ -46,27 +49,34 @@ public class AuthFilter implements Filter {
             }
             
             // Kiểm tra quyền truy cập trang admin
-            if (path.startsWith("/admin/") && !"ADMIN".equals(session.getAttribute("role"))) {
+            if (isAdminPage && !"ADMIN".equals(role)) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
             
-            // Cho phép truy cập các trang khác
+            // Cho phép truy cập tất cả các trang khác
             chain.doFilter(request, response);
             return;
         }
         
         // Xử lý khi chưa đăng nhập
-        if (isLoginPage || isRegisterPage || isPublicResource) {
+        if (isPublicPage || isPublicResource) {
             // Cho phép truy cập trang login, register và resource files
             chain.doFilter(request, response);
-        } else if (isHomePage || path.equals("/")) {
-            // Chuyển hướng về trang login nếu cố truy cập trang home hoặc trang chủ
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         } else {
             // Chuyển hướng về trang login cho các trang khác
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         }
+    }
+    
+    // Thêm phương thức hỗ trợ kiểm tra path
+    private boolean containsPath(String path, String[] allowedPaths) {
+        for (String allowedPath : allowedPaths) {
+            if (path.equals(allowedPath)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override
