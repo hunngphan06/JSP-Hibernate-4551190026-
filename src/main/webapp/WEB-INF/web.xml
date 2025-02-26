@@ -61,4 +61,33 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
+    <!-- Post Servlets -->
+    <servlet>
+        <servlet-name>PostServlet</servlet-name>
+        <servlet-class>org.example.servlet.PostServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostServlet</servlet-name>
+        <url-pattern>/post/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PostListServlet</servlet-name>
+        <servlet-class>org.example.servlet.PostListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PostListServlet</servlet-name>
+        <url-pattern>/posts</url-pattern>
+    </servlet-mapping>
+
+    <!-- Admin Post Servlet -->
+    <servlet>
+        <servlet-name>AdminPostServlet</servlet-name>
+        <servlet-class>org.example.servlet.AdminPostServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminPostServlet</servlet-name>
+        <url-pattern>/admin/posts/*</url-pattern>
+    </servlet-mapping>
+
 </web-app> 
