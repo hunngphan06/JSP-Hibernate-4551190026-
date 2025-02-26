@@ -8,6 +8,8 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         
         <class>org.example.entity.User</class>
+        <class>org.example.entity.Posts</class>
+        <class>org.example.entity.Follow</class>
         
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

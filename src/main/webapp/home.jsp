@@ -5,7 +5,28 @@
 
         <head>
             <title>Trang chủ</title>
+
             <style>
+                .btn-follow {
+                    padding: 4px 8px;
+                    margin-left: 10px;
+                    background-color: #1877f2;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                }
+
+                .btn-follow.following {
+                    background-color: #e4e6eb;
+                    color: #050505;
+                }
+
+                .btn-follow:hover {
+                    opacity: 0.9;
+                }
+
                 body {
                     font-family: Arial, sans-serif;
                     margin: 0;
@@ -154,6 +175,26 @@
                     border: 1px solid #ddd;
                     border-radius: 4px;
                 }
+
+                .btn-follow {
+                    padding: 4px 8px;
+                    margin-left: 10px;
+                    background-color: #1877f2;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                }
+
+                .btn-follow.following {
+                    background-color: #e4e6eb;
+                    color: #050505;
+                }
+
+                .btn-follow:hover {
+                    opacity: 0.9;
+                }
             </style>
         </head>
 
@@ -161,6 +202,10 @@
             <div class="header">
                 <h1>Trang chủ</h1>
                 <div class="user-info">
+                    <a href="${pageContext.request.contextPath}/follows/following" class="btn"
+                        style="margin-right: 10px; text-decoration: none; color: #000;">
+                        <i class="fas fa-users"></i> Theo dõi
+                    </a>
                     <span>Xin chào, ${sessionScope.user.username}</span>
                     <a href="${pageContext.request.contextPath}/logout" class="btn">Đăng xuất</a>
                 </div>
@@ -197,6 +242,21 @@
                                     <div class="post-author">
                                         <i class="fas fa-user"></i>
                                         <span>Người dùng: ${post.user.username}</span>
+                                        <c:if
+                                            test="${sessionScope.user != null && sessionScope.user.id != post.user.id}">
+                                            <button onclick="toggleFollow('${post.user.id}')"
+                                                class="btn-follow ${post.user.followedByCurrentUser ? 'following' : ''}"
+                                                id="follow-btn-${post.user.id}">
+                                                <c:choose>
+                                                    <c:when test="${post.user.followedByCurrentUser}">
+                                                        <i class="fas fa-user-minus"></i> Bỏ theo dõi
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="fas fa-user-plus"></i> Theo dõi
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </button>
+                                        </c:if>
                                     </div>
                                     <div class="post-date">
                                         <i class="far fa-clock"></i>
@@ -258,26 +318,6 @@
                     }
                 }
 
-                function editPost(postId) {
-                    const newTitle = prompt('Nhập tiêu đề mới:');
-                    const newBody = prompt('Nhập nội dung mới:');
-
-                    if (newTitle && newBody) {
-                        const formData = new FormData();
-                        formData.append('title', newTitle);
-                        formData.append('body', newBody);
-
-                        fetch('${pageContext.request.contextPath}/post/' + postId, {
-                            method: 'PUT',
-                            body: formData
-                        }).then(response => {
-                            if (response.ok) {
-                                location.reload();
-                            }
-                        });
-                    }
-                }
-
                 function deletePost(postId) {
                     if (confirm('Bạn có chắc muốn xóa bài viết này?')) {
                         fetch('${pageContext.request.contextPath}/post/' + postId, {
@@ -288,6 +328,44 @@
                             }
                         });
                     }
+                }
+
+                function toggleFollow(userId) {
+                    // Lấy tất cả các nút follow của user này
+                    const followButtons = document.querySelectorAll(`[id^="follow-btn-${userId}"]`);
+                    if (!followButtons.length) {
+                        console.error(`No follow buttons found for user ${userId}`);
+                        return;
+                    }
+
+                    // Lấy trạng thái hiện tại từ nút đầu tiên
+                    const isFollowing = followButtons[0].classList.contains('following');
+                    const method = isFollowing ? 'DELETE' : 'POST';
+
+                    const baseUrl = '${pageContext.request.contextPath}';
+                    const url = baseUrl + "/follow/" + userId;
+                    fetch(url, {
+                        method: method
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Cập nhật tất cả các nút follow của user này
+                                followButtons.forEach(button => {
+                                    button.classList.toggle('following');
+                                    if (isFollowing) {
+                                        button.innerHTML = '<i class="fas fa-user-plus"></i> Theo dõi';
+                                    } else {
+                                        button.innerHTML = '<i class="fas fa-user-minus"></i> Bỏ theo dõi';
+                                    }
+                                });
+                            } else {
+                                alert('Có lỗi xảy ra khi thực hiện thao tác này');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra khi thực hiện thao tác này');
+                        });
                 }
             </script>
         </body>

@@ -22,6 +22,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Posts> posts = new ArrayList<>();
     
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> following = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "following") 
+    private List<Follow> followers = new ArrayList<>();
+    
+    @Transient
+    private boolean followedByCurrentUser;
+    
     // Getters and Setters
     public Long getId() {
         return id;
@@ -69,5 +78,29 @@ public class User {
 
     public void setPosts(List<Posts> posts) {
         this.posts = posts;
+    }
+
+    public List<Follow> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<Follow> following) {
+        this.following = following;
+    }
+
+    public List<Follow> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Follow> followers) {
+        this.followers = followers;
+    }
+
+    public boolean getFollowedByCurrentUser() {
+        return followedByCurrentUser;
+    }
+
+    public void setFollowedByCurrentUser(boolean followedByCurrentUser) {
+        this.followedByCurrentUser = followedByCurrentUser;
     }
 } 

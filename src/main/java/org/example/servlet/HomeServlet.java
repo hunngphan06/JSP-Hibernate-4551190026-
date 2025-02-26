@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.entity.Posts;
+import org.example.entity.User;
 import org.example.util.JPAUtil;
 
 import java.io.IOException;
@@ -46,6 +47,29 @@ public class HomeServlet extends HttpServlet {
                     .setFirstResult(offset)
                     .setMaxResults(POSTS_PER_PAGE)
                     .getResultList();
+
+            // Kiểm tra trạng thái follow cho mỗi user của bài viết
+            User currentUser = (User) request.getSession().getAttribute("user");
+
+            for (Posts post : posts) {
+                User postUser = post.getUser();
+                if (currentUser != null && !currentUser.getId().equals(postUser.getId())) {
+                    try {
+                        boolean isFollowing = em.createQuery(
+                            "SELECT COUNT(f) > 0 FROM Follow f WHERE f.follower.id = :followerId AND f.following.id = :followingId",
+                            Boolean.class)
+                            .setParameter("followerId", currentUser.getId())
+                            .setParameter("followingId", postUser.getId())
+                            .getSingleResult();
+                        
+                        postUser.setFollowedByCurrentUser(isFollowing);
+                    } catch (Exception e) {
+                        // Log error và set default value
+                        e.printStackTrace();
+                        postUser.setFollowedByCurrentUser(false);
+                    }
+                }
+            }
 
             // Đặt các thuộc tính vào request
             request.setAttribute("posts", posts);

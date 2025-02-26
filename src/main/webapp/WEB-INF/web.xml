@@ -90,4 +90,25 @@
         <url-pattern>/admin/posts/*</url-pattern>
     </servlet-mapping>
 
+    <!-- Follow Servlet -->
+    <servlet>
+        <servlet-name>FollowListServlet</servlet-name>
+        <servlet-class>org.example.servlet.FollowListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FollowListServlet</servlet-name>
+        <url-pattern>/follows/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Follow Servlet -->
+    <servlet>
+        <servlet-name>FollowServlet</servlet-name>
+        <servlet-class>org.example.servlet.FollowServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FollowServlet</servlet-name>
+        <url-pattern>/follow/*</url-pattern>
+    </servlet-mapping>
+
+
 </web-app> 
