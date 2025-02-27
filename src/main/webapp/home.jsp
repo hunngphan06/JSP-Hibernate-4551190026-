@@ -242,8 +242,7 @@
                                     <div class="post-author">
                                         <i class="fas fa-user"></i>
                                         <span>Người dùng: ${post.user.username}</span>
-                                        <c:if
-                                            test="${sessionScope.user != null && sessionScope.user.id != post.user.id}">
+                                        <c:if test="${sessionScope.user != null and sessionScope.user.id != post.user.id}">
                                             <button onclick="toggleFollow('${post.user.id}')"
                                                 class="btn-follow ${post.user.followedByCurrentUser ? 'following' : ''}"
                                                 id="follow-btn-${post.user.id}">
@@ -331,15 +330,10 @@
                 }
 
                 function toggleFollow(userId) {
-                    // Lấy tất cả các nút follow của user này
-                    const followButtons = document.querySelectorAll(`[id^="follow-btn-${userId}"]`);
-                    if (!followButtons.length) {
-                        console.error(`No follow buttons found for user ${userId}`);
-                        return;
-                    }
+                    const buttonId = 'follow-btn-' + userId;
+                    const followButton = document.getElementById(buttonId);
 
-                    // Lấy trạng thái hiện tại từ nút đầu tiên
-                    const isFollowing = followButtons[0].classList.contains('following');
+                    const isFollowing = followButton.classList.contains('following');
                     const method = isFollowing ? 'DELETE' : 'POST';
 
                     const baseUrl = '${pageContext.request.contextPath}';
@@ -349,15 +343,14 @@
                     })
                         .then(response => {
                             if (response.ok) {
-                                // Cập nhật tất cả các nút follow của user này
-                                followButtons.forEach(button => {
-                                    button.classList.toggle('following');
-                                    if (isFollowing) {
-                                        button.innerHTML = '<i class="fas fa-user-plus"></i> Theo dõi';
-                                    } else {
-                                        button.innerHTML = '<i class="fas fa-user-minus"></i> Bỏ theo dõi';
-                                    }
-                                });
+                                // Cập nhật chỉ button của user này
+                                followButton.classList.toggle('following');
+                                if (isFollowing) {
+                                    followButton.innerHTML = '<i class="fas fa-user-plus"></i> Theo dõi';
+                                } else {
+                                    followButton.innerHTML = '<i class="fas fa-user-minus"></i> Bỏ theo dõi';
+                                }
+                                window.location.reload();
                             } else {
                                 alert('Có lỗi xảy ra khi thực hiện thao tác này');
                             }
