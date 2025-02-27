@@ -130,11 +130,8 @@
                                 <c:forEach items="${followers}" var="user">
                                     <div class="user-item">
                                         <div class="user-info">
-                                            <img src="${pageContext.request.contextPath}/images/avatar-default.png"
-                                                alt="Avatar" class="avatar">
                                             <div class="user-details">
                                                 <h3>${user.username}</h3>
-                                                <p>${user.email}</p>
                                             </div>
                                         </div>
                                         <button onclick="followUser('${user.id}')"
